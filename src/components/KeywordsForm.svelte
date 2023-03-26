@@ -62,9 +62,16 @@
     }
 
     button {
+        transition: all 0.8s;
         background: linear-gradient(to right, #d2721c, #10b981);
         background-size: 400% 400%;
         animation: gradient 4.5s ease-in-out infinite;
+    }
+
+    button:hover {
+        transform: scale(1.01);
+        background: none;
+        background-color: #000;
     }
 
     @keyframes gradient {
