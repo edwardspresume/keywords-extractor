@@ -36,7 +36,7 @@
 
     <button
         type="submit"
-        class="w-full p-2 text-slate-100 bg-sky-400 rounded-lg shadow-sm font-bold"
+        class="w-full p-3 text-slate-100 rounded-lg shadow-sm font-bold"
     >
         Extract Keywords
     </button>
@@ -51,3 +51,31 @@
         {responseMessage}
     </div>
 {/if}
+
+<style>
+    .success {
+        color: #10b981;
+    }
+
+    .error {
+        color: #ef4444;
+    }
+
+    button {
+        background: linear-gradient(to right, #d2721c, #10b981);
+        background-size: 400% 400%;
+        animation: gradient 4.5s ease-in-out infinite;
+    }
+
+    @keyframes gradient {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+</style>
