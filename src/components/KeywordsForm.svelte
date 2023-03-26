@@ -40,14 +40,14 @@
     >
         Extract Keywords
     </button>
-
-    {#if responseMessage}
-        <div
-            class="p-2 mt-5 text-slate-100 rounded-lg shadow-sm font-bold"
-            class:success={isSuccess}
-            class:error={!isSuccess}
-        >
-            {responseMessage}
-        </div>
-    {/if}
 </form>
+
+{#if responseMessage}
+    <div
+        class="p-2 mt-5 text-slate-900 rounded-lg shadow-sm font-bold bg-slate-100"
+        class:success={isSuccess}
+        class:error={!isSuccess}
+    >
+        {responseMessage}
+    </div>
+{/if}
