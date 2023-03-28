@@ -3,11 +3,13 @@ import light_bulb from '../assets/light_bulb_small.png';
 import KeywordsForm from '../components/KeywordsForm.svelte';
 ---
 
+<!DOCTYPE html>
 <html lang='en'>
     <head>
-        <meta charset='utf-8' />
+        <meta charset='UTF-8' />
         <link rel='icon' type='image/svg+xml' href='/favicon.svg' />
-        <meta name='viewport' content='width=device-width' />
+        <meta http-equiv='X-UA-Compatible' content='IE=edge' />
+        <meta name='viewport' content='width=device-width, initial-scale=1.0' />
         <meta name='generator' content={Astro.generator} />
         <title>Keyword Extractor</title>
     </head>
@@ -20,7 +22,9 @@ import KeywordsForm from '../components/KeywordsForm.svelte';
                     class='w-20 mx-auto drop-shadow-lg'
                 />
 
-                <h1 class='text-3xl md:text-5xl font-bold mt-2'>Keyword Extractor</h1>
+                <h1 class='text-3xl md:text-5xl font-bold mt-2'>
+                    Keyword Extractor
+                </h1>
 
                 <p class='my-5'>
                     Paste in your text below and we'll extract the keywords for
