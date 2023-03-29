@@ -1,64 +1,88 @@
 import type { APIRoute } from 'astro';
 
+const MAX_CONTENT_LENGTH = 300;
+async function fetchKeywordsFromOpenAI(inputContent: string) {
+    if (!inputContent.trim()) {
+        throw new Error('Please enter some text to process.');
+    }
+
+    if (inputContent.length > MAX_CONTENT_LENGTH) {
+        throw new Error(
+            `Input content is too long. The maximum length is ${MAX_CONTENT_LENGTH} characters.`
+        );
+    }
+
+    if (!process.env.OPENAI_API_KEY) {
+        throw new Error(
+            'OPENAI_API_KEY is missing in the environment variables.'
+        );
+    }
+
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        },
+        body: JSON.stringify({
+            model: 'gpt-3.5-turbo',
+            messages: [
+                {
+                    role: 'user',
+                    content: `Extract the main keywords from the text below, capitalizing the first letter of each word and separating them with commas \n\n Text: ${inputContent}`,
+                },
+            ],
+            max_tokens: 60,
+            temperature: 0.5,
+            frequency_penalty: 0.8,
+        }),
+    };
+
+    const response = await fetch(
+        'https://api.openai.com/v1/chat/completions',
+        options
+    );
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`OpenAI API Error: ${errorText}`);
+        throw new Error('Failed to fetch data from the OpenAI API.');
+    }
+    const keywordText = (await response.json())?.choices?.[0]?.message?.content;
+
+    if (!keywordText) {
+        throw new Error('Invalid response data received from the OpenAI API.');
+    }
+
+    return keywordText.trim();
+}
+
 export const post: APIRoute = async ({ request }) => {
     try {
-        const data = await request.formData();
-        const text = data.get('text')?.toString().trim();
+        const inputContent = await request.text();
+        const keywords = await fetchKeywordsFromOpenAI(inputContent);
 
-        if (!text) {
-            return new Response(
-                JSON.stringify({
-                    message: 'Please enter some text.',
-                }),
-                { status: 400 }
-            );
-        }
-
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-            },
-            body: JSON.stringify({
-                model: 'text-davinci-003',
-                prompt: `Extract keywords from the text below. Ensure the first letter of each word is capitalized and separate the words with commas:\n\n${text}`,
-                max_tokens: 60,
-                temperature: 0.5,
-                frequency_penalty: 0.8,
-            }),
-        };
-
-        const response = await fetch(
-            'https://api.openai.com/v1/completions',
-            options
-        );
-
-        const keyWordData = await response.json();
-        const keywords = keyWordData.choices[0].text.trim();
-
-        console.log(keywords);
-
-        return new Response(
-            JSON.stringify({
-                message: keywords,
-            }),
-            { status: 200 }
-        );
+        return new Response(JSON.stringify({ message: keywords }), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+        });
     } catch (error: unknown) {
-        if (error instanceof Error) {
-            console.error(error);
-        } else {
-            console.error(new Error(`Unknown error: ${JSON.stringify(error)}`));
-        }
+        console.error(
+            'Error processing request:',
+            error instanceof Error ? error : new Error(JSON.stringify(error))
+        );
 
-        // Return a server error response in case of an unexpected error
         return new Response(
             JSON.stringify({
-                message: 'An error occurred while processing your request.',
-                error: error instanceof Error ? error.message : 'Unknown error',
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : 'An error occurred while processing your request.',
             }),
-            { status: 500 }
+            {
+                status: 500,
+                headers: { 'Content-Type': 'application/json' },
+            }
         );
     }
 };
