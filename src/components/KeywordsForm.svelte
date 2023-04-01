@@ -2,6 +2,7 @@
     let responseMessage: string | null = null;
     let isSuccess: boolean | null = null;
     let inputText = '';
+    let isLoading = false;
     $: textLength = inputText.length;
 
     async function submit(e: SubmitEvent) {
@@ -14,6 +15,8 @@
         }
 
         try {
+            isLoading = true;
+
             const response = await fetch('/api/extractKeywords', {
                 method: 'POST',
                 body: inputText,
@@ -27,6 +30,8 @@
             isSuccess = false;
             responseMessage =
                 'An unexpected error occurred while processing your request.';
+        } finally {
+            isLoading = false;
         }
     }
 
@@ -58,9 +63,10 @@
 
     <button
         type="submit"
+        disabled={isLoading}
         class="w-full p-3 text-white rounded-lg shadow-sm font-bold"
     >
-        Extract Keywords
+        {isLoading ? 'Loading...' : 'Extract Keywords'}
     </button>
 </form>
 
