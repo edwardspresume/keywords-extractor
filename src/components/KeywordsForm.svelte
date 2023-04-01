@@ -37,22 +37,22 @@
 
 <form on:submit={submit}>
     <label for="inputContent" class="flex justify-between items-center mb-1">
-        <span>Content</span>
+        <span>Text</span>
 
         <span class="text-gray-400 text-sm">
-            <var>{textLength}</var><span>/300</span>
+            <var>{textLength}</var><span>/600</span>
         </span>
     </label>
 
     <textarea
         required
         minlength="10"
-        maxlength="300"
+        maxlength="600"
         on:input={handleInput}
         bind:value={inputContent}
         id="inputContent"
         enterkeyhint="enter"
-        placeholder="Paste your text here"
+        placeholder="Enter your text here"
         class="w-full h-40 p-2 mb-5 border border-gray-300 rounded-lg shadow-sm text-gray-700"
     />
 
@@ -66,7 +66,7 @@
 
 {#if responseMessage}
     <div
-        class="p-2 mt-5 text-gray-900 rounded-lg shadow-sm font-bold bg-gray-200"
+        class="p-2 mt-5 rounded-lg shadow-sm font-bold bg-gray-200"
         class:success={isSuccess}
         class:error={!isSuccess}
     >

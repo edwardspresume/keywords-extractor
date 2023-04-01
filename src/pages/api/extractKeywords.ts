@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 
-const MAX_CONTENT_LENGTH = 300;
+const MAX_CONTENT_LENGTH = 600;
 async function fetchKeywordsFromOpenAI(inputContent: string) {
     if (!inputContent.trim()) {
         throw new Error('Please enter some text to process.');
@@ -28,8 +28,13 @@ async function fetchKeywordsFromOpenAI(inputContent: string) {
             model: 'gpt-3.5-turbo',
             messages: [
                 {
+                    role: 'system',
+                    content:
+                        'Your a skilled keywords extractor system. Extract keywords from the input text, capitalizing the first letter of each word and separating them with commas',
+                },
+                {
                     role: 'user',
-                    content: `Extract the main keywords from the text below, capitalizing the first letter of each word and separating them with commas \n\n Text: ${inputContent}`,
+                    content: inputContent,
                 },
             ],
             max_tokens: 60,
