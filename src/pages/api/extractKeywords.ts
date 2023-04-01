@@ -5,7 +5,6 @@ const MAX_CONTENT_LENGTH = 600;
 
 const InputDataSchema = z
     .string()
-    .trim()
     .min(1, 'Please enter some text to process.')
     .max(
         MAX_CONTENT_LENGTH,
@@ -67,7 +66,7 @@ async function fetchKeywordsFromOpenAI(inputText: InputText) {
 
 export const post: APIRoute = async ({ request }) => {
     try {
-        const inputText = await request.text();
+        const inputText = (await request.text()).trim();
         const validationResult = InputDataSchema.safeParse(inputText);
 
         if (!validationResult.success) {

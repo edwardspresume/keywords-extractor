@@ -8,7 +8,7 @@
     async function submit(e: SubmitEvent) {
         e.preventDefault();
 
-        if (!inputText.trim()) {
+        if (!inputText) {
             isSuccess = false;
             responseMessage = 'Please enter some text to process.';
             return;
@@ -16,15 +16,14 @@
 
         try {
             isLoading = true;
-
             const response = await fetch('/api/extractKeywords', {
                 method: 'POST',
                 body: inputText,
             });
 
+            isSuccess = response.ok;
             const responseData = await response.json();
             responseMessage = responseData.message;
-            isSuccess = response.ok;
         } catch (error) {
             console.error('Error submitting form:', error);
             isSuccess = false;
