@@ -1,17 +1,21 @@
 import type { APIRoute } from 'astro';
+import { z } from 'zod';
 
 const MAX_CONTENT_LENGTH = 600;
-async function fetchKeywordsFromOpenAI(inputContent: string) {
-    if (!inputContent.trim()) {
-        throw new Error('Please enter some text to process.');
-    }
 
-    if (inputContent.length > MAX_CONTENT_LENGTH) {
-        throw new Error(
-            `Input content is too long. The maximum length is ${MAX_CONTENT_LENGTH} characters.`
-        );
-    }
+const InputDataSchema = z
+    .string()
+    .trim()
+    .min(1, 'Please enter some text to process.')
+    .max(
+        MAX_CONTENT_LENGTH,
+        `Input content is too long. The maximum length is ${MAX_CONTENT_LENGTH} characters.`
+    );
 
+// Define the type for the validated data
+type InputText = z.infer<typeof InputDataSchema>;
+
+async function fetchKeywordsFromOpenAI(inputText: InputText) {
     if (!process.env.OPENAI_API_KEY) {
         throw new Error(
             'OPENAI_API_KEY is missing in the environment variables.'
@@ -29,12 +33,11 @@ async function fetchKeywordsFromOpenAI(inputContent: string) {
             messages: [
                 {
                     role: 'system',
-                    content:
-                        'Your a skilled keywords extractor system. Extract keywords from the input text, capitalizing the first letter of each word and separating them with commas',
+                    content: 'Only extract the keywords from the input text',
                 },
                 {
                     role: 'user',
-                    content: inputContent,
+                    content: inputText,
                 },
             ],
             max_tokens: 60,
@@ -53,19 +56,31 @@ async function fetchKeywordsFromOpenAI(inputContent: string) {
         console.error(`OpenAI API Error: ${errorText}`);
         throw new Error('Failed to fetch data from the OpenAI API.');
     }
-    const keywordText = (await response.json())?.choices?.[0]?.message?.content;
+    const keywords = (await response.json())?.choices?.[0]?.message?.content;
 
-    if (!keywordText) {
+    if (!keywords) {
         throw new Error('Invalid response data received from the OpenAI API.');
     }
 
-    return keywordText.trim();
+    return keywords.trim();
 }
 
 export const post: APIRoute = async ({ request }) => {
     try {
-        const inputContent = await request.text();
-        const keywords = await fetchKeywordsFromOpenAI(inputContent);
+        const inputText = await request.text();
+        const validationResult = InputDataSchema.safeParse(inputText);
+
+        if (!validationResult.success) {
+            return new Response(
+                JSON.stringify({ message: validationResult.error.message }),
+                {
+                    status: 400,
+                    headers: { 'Content-Type': 'application/json' },
+                }
+            );
+        }
+
+        const keywords = await fetchKeywordsFromOpenAI(validationResult.data);
 
         return new Response(JSON.stringify({ message: keywords }), {
             status: 200,
