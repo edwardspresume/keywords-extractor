@@ -1,13 +1,13 @@
 <script lang="ts">
     let responseMessage: string | null = null;
     let isSuccess: boolean | null = null;
-    let inputContent = '';
-    $: textLength = inputContent.length;
+    let inputText = '';
+    $: textLength = inputText.length;
 
     async function submit(e: SubmitEvent) {
         e.preventDefault();
 
-        if (!inputContent.trim()) {
+        if (!inputText.trim()) {
             isSuccess = false;
             responseMessage = 'Please enter some text to process.';
             return;
@@ -16,7 +16,7 @@
         try {
             const response = await fetch('/api/extractKeywords', {
                 method: 'POST',
-                body: inputContent,
+                body: inputText,
             });
 
             const responseData = await response.json();
@@ -31,12 +31,12 @@
     }
 
     function handleInput(e: Event) {
-        inputContent = (e.target as HTMLTextAreaElement).value.trim();
+        inputText = (e.target as HTMLTextAreaElement).value.trim();
     }
 </script>
 
 <form on:submit={submit}>
-    <label for="inputContent" class="flex justify-between items-center mb-1">
+    <label for="inputText" class="flex justify-between items-center mb-1">
         <span>Text</span>
 
         <span class="text-gray-400 text-sm">
@@ -49,8 +49,8 @@
         minlength="10"
         maxlength="600"
         on:input={handleInput}
-        bind:value={inputContent}
-        id="inputContent"
+        bind:value={inputText}
+        id="inputText"
         enterkeyhint="enter"
         placeholder="Enter your text here"
         class="w-full h-40 p-2 mb-5 border border-gray-300 rounded-lg shadow-sm text-gray-700"
