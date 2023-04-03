@@ -1,4 +1,7 @@
 <script lang="ts">
+    import Icon from 'svelte-awesome';
+    import clipboard from 'svelte-awesome/icons/clipboard';
+
     let inputText = '';
     $: textLength = inputText.length;
 
@@ -146,11 +149,8 @@
     >
         <div class="w-full flex justify-between items-center mb-3">
             <h3 class="font-bold">Keywords:</h3>
-            <button
-                on:click={copyKeywordsToClipboard}
-                class="text-white bg-green-500 rounded-lg shadow-sm font-bold text-sm p-1"
-            >
-                Copy
+            <button on:click={copyKeywordsToClipboard} title="Copy keywords">
+                <Icon data={clipboard} class="text-gray-900" />
             </button>
         </div>
         <p class="text-green-800">
@@ -167,7 +167,7 @@
         animation: gradient 4.5s ease-in-out infinite;
     }
 
-    button:hover {
+    button[type='submit']:hover {
         transform: scale(1.01);
         background: none;
         background-color: #000;
