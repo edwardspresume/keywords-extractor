@@ -1,33 +1,42 @@
 <script lang="ts">
-    let responseMessage: string | null = null;
+    let errorMessage: string | null = null;
     let isSuccess: boolean | null = null;
     let inputText = '';
     let isLoading = false;
+    let keywords: string | null = null;
     $: textLength = inputText.length;
 
-    async function submit(e: SubmitEvent) {
+    async function submit(e: Event) {
         e.preventDefault();
 
         if (!inputText) {
             isSuccess = false;
-            responseMessage = 'Please enter some text to process.';
+            errorMessage = 'Please enter some text to process.';
             return;
         }
+
+        const formData = new FormData(e.target as HTMLFormElement);
 
         try {
             isLoading = true;
             const response = await fetch('/api/extractKeywords', {
                 method: 'POST',
-                body: inputText,
+                body: formData,
             });
 
             isSuccess = response.ok;
             const responseData = await response.json();
-            responseMessage = responseData.message;
+
+            if (isSuccess) {
+                keywords = responseData.keywords;
+                errorMessage = null;
+            } else {
+                errorMessage = responseData.error;
+            }
         } catch (error) {
             console.error('Error submitting form:', error);
             isSuccess = false;
-            responseMessage =
+            errorMessage =
                 'An unexpected error occurred while processing your request.';
         } finally {
             isLoading = false;
@@ -37,9 +46,40 @@
     function handleInput(e: Event) {
         inputText = (e.target as HTMLTextAreaElement).value.trim();
     }
+
+    async function copyKeywordsToClipboard() {
+        if (keywords) {
+            await navigator.clipboard.writeText(keywords);
+            alert('Keywords copied to clipboard!');
+        }
+    }
 </script>
 
 <form on:submit={submit}>
+    <label>
+        <select
+            required
+            name="language"
+            class="w-full p-2 mb-5 border border-gray-300 rounded-lg shadow-sm text-gray-700"
+        >
+            <option value="english" selected>English</option>
+            <option value="chinese">Chinese</option>
+            <option value="spanish">Spanish</option>
+            <option value="french">French</option>
+            <option value="russian">Russian</option>
+            <option value="german">German</option>
+            <option value="japanese">Japanese</option>
+            <option value="portuguese">Portuguese</option>
+            <option value="italian">Italian</option>
+            <option value="hindi">Hindi</option>
+            <option value="arabic">Arabic</option>
+            <option value="bengali">Bengali</option>
+            <option value="indonesian">Indonesian</option>
+            <option value="korean">Korean</option>
+            <option value="turkish">Turkish</option>
+        </select>
+    </label>
+
     <label for="inputText" class="flex justify-between items-center mb-1">
         <span>Text</span>
 
@@ -52,6 +92,7 @@
         required
         minlength="10"
         maxlength="600"
+        name="text"
         on:input={handleInput}
         bind:value={inputText}
         id="inputText"
@@ -69,25 +110,29 @@
     </button>
 </form>
 
-{#if responseMessage}
+{#if errorMessage}
     <div
-        class="p-2 mt-5 rounded-lg shadow-sm font-bold bg-gray-200"
-        class:success={isSuccess}
-        class:error={!isSuccess}
+        class="p-2 mt-5 rounded-lg shadow-sm font-bold bg-gray-200 text-red-700"
     >
-        {responseMessage}
+        {errorMessage}
+    </div>
+{/if}
+
+{#if isSuccess && keywords}
+    <div
+        class="p-2 mt-5 rounded-lg shadow-sm font-bold bg-gray-100 text-green-600"
+    >
+        Keywords: {keywords}
+        <button
+            on:click={copyKeywordsToClipboard}
+            class="ml-2 p-1 mt-2 text-white bg-green-500 rounded-lg shadow-sm font-bold"
+        >
+            Copy to Clipboard
+        </button>
     </div>
 {/if}
 
 <style>
-    .success {
-        color: #10b981;
-    }
-
-    .error {
-        color: #ef4444;
-    }
-
     button {
         transition: all 0.8s;
         background: linear-gradient(to right, #d2721c, #10b981);

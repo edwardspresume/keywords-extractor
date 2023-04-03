@@ -3,18 +3,39 @@ import { z } from 'zod';
 
 const MAX_CONTENT_LENGTH = 600;
 
-const InputDataSchema = z
-    .string()
-    .min(1, 'Please enter some text to process.')
-    .max(
-        MAX_CONTENT_LENGTH,
-        `Input content is too long. The maximum length is ${MAX_CONTENT_LENGTH} characters.`
-    );
+const FormDataSchema = z.object({
+    text: z
+        .string()
+        .min(1, 'Please enter some text to process.')
+        .max(
+            MAX_CONTENT_LENGTH,
+            `Input content is too long. The maximum length is ${MAX_CONTENT_LENGTH} characters.`
+        ),
+    language: z.enum([
+        'english',
+        'chinese',
+        'spanish',
+        'french',
+        'russian',
+        'german',
+        'japanese',
+        'portuguese',
+        'italian',
+        'hindi',
+        'arabic',
+        'bengali',
+        'indonesian',
+        'korean',
+        'turkish',
+    ]),
+});
 
 // Define the type for the validated data
-type InputText = z.infer<typeof InputDataSchema>;
+type FormData = z.infer<typeof FormDataSchema>;
 
-async function fetchKeywordsFromOpenAI(inputText: InputText) {
+async function fetchKeywordsFromOpenAI(formData: FormData) {
+    const { text, language } = formData;
+
     if (!process.env.OPENAI_API_KEY) {
         throw new Error(
             'OPENAI_API_KEY is missing in the environment variables.'
@@ -32,11 +53,11 @@ async function fetchKeywordsFromOpenAI(inputText: InputText) {
             messages: [
                 {
                     role: 'system',
-                    content: 'Only extract the keywords from the input text',
+                    content: `Only extract the keywords from the input text return the keywords in the following language: ${language}}`,
                 },
                 {
                     role: 'user',
-                    content: inputText,
+                    content: text,
                 },
             ],
             max_tokens: 60,
@@ -66,12 +87,13 @@ async function fetchKeywordsFromOpenAI(inputText: InputText) {
 
 export const post: APIRoute = async ({ request }) => {
     try {
-        const inputText = (await request.text()).trim();
-        const validationResult = InputDataSchema.safeParse(inputText);
+        const formData = Object.fromEntries(await request.formData());
+
+        const validationResult = FormDataSchema.safeParse(formData);
 
         if (!validationResult.success) {
             return new Response(
-                JSON.stringify({ message: validationResult.error.message }),
+                JSON.stringify({ error: validationResult.error.message }),
                 {
                     status: 400,
                     headers: { 'Content-Type': 'application/json' },
@@ -81,7 +103,7 @@ export const post: APIRoute = async ({ request }) => {
 
         const keywords = await fetchKeywordsFromOpenAI(validationResult.data);
 
-        return new Response(JSON.stringify({ message: keywords }), {
+        return new Response(JSON.stringify({ keywords }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
         });
@@ -93,7 +115,7 @@ export const post: APIRoute = async ({ request }) => {
 
         return new Response(
             JSON.stringify({
-                message:
+                error:
                     error instanceof Error
                         ? error.message
                         : 'An error occurred while processing your request.',
