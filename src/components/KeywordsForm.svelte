@@ -1,16 +1,15 @@
 <script lang="ts">
-    let errorMessage: string | null = null;
-    let isSuccess: boolean | null = null;
     let inputText = '';
+    $: textLength = inputText.length;
+
     let isLoading = false;
     let keywords: string | null = null;
-    $: textLength = inputText.length;
+    let errorMessage: string | null = null;
 
     async function submit(e: Event) {
         e.preventDefault();
 
         if (!inputText) {
-            isSuccess = false;
             errorMessage = 'Please enter some text to process.';
             return;
         }
@@ -24,18 +23,15 @@
                 body: formData,
             });
 
-            isSuccess = response.ok;
             const responseData = await response.json();
 
-            if (isSuccess) {
+            if (response.ok) {
                 keywords = responseData.keywords;
-                errorMessage = null;
             } else {
                 errorMessage = responseData.error;
             }
         } catch (error) {
             console.error('Error submitting form:', error);
-            isSuccess = false;
             errorMessage =
                 'An unexpected error occurred while processing your request.';
         } finally {
@@ -82,7 +78,6 @@
 
     <label for="inputText" class="flex justify-between items-center mb-1">
         <span>Text</span>
-
         <span class="text-gray-400 text-sm">
             <var>{textLength}</var><span>/600</span>
         </span>
@@ -112,21 +107,21 @@
 
 {#if errorMessage}
     <div
-        class="p-2 mt-5 rounded-lg shadow-sm font-bold bg-gray-200 text-red-700"
+        class="p-2 mt-5 rounded-lg shadow-sm font-bold bg-red-200 text-red-700"
     >
         {errorMessage}
     </div>
 {/if}
 
-{#if isSuccess && keywords}
-    <div class="p-3 mt-5 rounded-lg shadow-sm bg-gray-100 flex flex-col">
-        <div
-            class="w-full flex justify-between items-center text-green-600 mb-3"
-        >
-            <h3 class="font-bold">Keywords</h3>
+{#if keywords}
+    <div
+        class="p-3 mt-5 rounded-lg shadow-sm bg-gray-100 text-green-600 flex flex-col"
+    >
+        <div class="w-full flex justify-between items-center mb-3">
+            <h3 class="font-bold">Keywords:</h3>
             <button
                 on:click={copyKeywordsToClipboard}
-                class="text-white bg-green-500 rounded-lg shadow-sm text-sm font-bold p-1"
+                class="text-white bg-green-500 rounded-lg shadow-sm font-bold text-sm p-1"
             >
                 Copy
             </button>
