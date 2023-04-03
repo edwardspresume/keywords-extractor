@@ -150,7 +150,7 @@
         <div class="w-full flex justify-between items-center mb-3">
             <h3 class="font-bold">Keywords:</h3>
             <button on:click={copyKeywordsToClipboard} title="Copy keywords">
-                <Icon data={clipboard} class="text-gray-900" />
+                <Icon data={clipboard} class="text-gray-500" />
             </button>
         </div>
         <p class="text-green-800">
