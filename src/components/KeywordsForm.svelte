@@ -7,7 +7,6 @@
     let errorMessage: string | null = null;
 
     async function submit(e: Event) {
-
         if (!inputText) {
             errorMessage = 'Please enter some text to process.';
             return;
@@ -51,30 +50,6 @@
 </script>
 
 <form on:submit|preventDefault={submit}>
-    <label>
-        <select
-            required
-            name="language"
-            class="w-full p-2 mb-5 border border-gray-300 rounded-lg shadow-sm text-gray-700"
-        >
-            <option value="english" selected>English</option>
-            <option value="chinese">Chinese</option>
-            <option value="spanish">Spanish</option>
-            <option value="french">French</option>
-            <option value="russian">Russian</option>
-            <option value="german">German</option>
-            <option value="japanese">Japanese</option>
-            <option value="portuguese">Portuguese</option>
-            <option value="italian">Italian</option>
-            <option value="hindi">Hindi</option>
-            <option value="arabic">Arabic</option>
-            <option value="bengali">Bengali</option>
-            <option value="indonesian">Indonesian</option>
-            <option value="korean">Korean</option>
-            <option value="turkish">Turkish</option>
-        </select>
-    </label>
-
     <label for="inputText" class="flex justify-between items-center mb-1">
         <span>Text</span>
         <span class="text-gray-400 text-sm">
@@ -92,8 +67,61 @@
         id="inputText"
         enterkeyhint="enter"
         placeholder="Enter your text here"
-        class="w-full h-40 p-2 mb-5 border border-gray-300 rounded-lg shadow-sm text-gray-700"
+        class="w-full h-40 p-2 border border-gray-300 rounded-lg shadow-sm text-gray-700"
     />
+
+    <fieldset class="flex gap-x-3 mb-10 mt-1">
+        <label>
+            <span> Language </span>
+            <select
+                required
+                name="language"
+                class="w-full p-2 mt-1 border border-gray-300 rounded-lg shadow-sm text-gray-700"
+            >
+                <option value="english" selected>English</option>
+                <option value="chinese">Chinese</option>
+                <option value="spanish">Spanish</option>
+                <option value="french">French</option>
+                <option value="russian">Russian</option>
+                <option value="german">German</option>
+                <option value="japanese">Japanese</option>
+                <option value="portuguese">Portuguese</option>
+                <option value="italian">Italian</option>
+                <option value="hindi">Hindi</option>
+                <option value="arabic">Arabic</option>
+                <option value="bengali">Bengali</option>
+                <option value="indonesian">Indonesian</option>
+                <option value="korean">Korean</option>
+                <option value="turkish">Turkish</option>
+            </select>
+        </label>
+
+        <label>
+            <span>Category</span>
+            <select
+                required
+                name="category"
+                class="w-full p-2 mt-1 border border-gray-300 rounded-lg shadow-sm text-gray-700"
+            >
+                <option value="general" selected>General</option>
+                <option value="academic">Academic Research</option>
+                <option value="marketing">Marketing</option>
+                <option value="news">News Articles</option>
+                <option value="technology">Technology</option>
+                <option value="healthcare">Healthcare</option>
+                <option value="finance">Finance</option>
+                <option value="sports">Sports</option>
+                <option value="politics">Politics</option>
+                <option value="entertainment">Entertainment</option>
+                <option value="environment">Environment</option>
+                <option value="formal">Formal Writing</option>
+                <option value="informal">Informal Writing</option>
+                <option value="positive">Positive Sentiment</option>
+                <option value="negative">Negative Sentiment</option>
+                <option value="neutral">Neutral Sentiment</option>
+            </select>
+        </label>
+    </fieldset>
 
     <button
         type="submit"
