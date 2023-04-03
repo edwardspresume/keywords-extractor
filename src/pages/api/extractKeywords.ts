@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { z } from 'zod';
+import { translateKeyWords } from '../../utils/translateKeyWords';
 
 const MAX_CONTENT_LENGTH = 600;
 
@@ -19,7 +20,7 @@ const FormDataSchema = z.object({
 type FormData = z.infer<typeof FormDataSchema>;
 
 async function fetchKeywordsFromOpenAI(formData: FormData) {
-    const { text, language, category } = formData;
+    const { text, category } = formData;
 
     if (!process.env.OPENAI_API_KEY) {
         throw new Error(
@@ -27,16 +28,12 @@ async function fetchKeywordsFromOpenAI(formData: FormData) {
         );
     }
 
-    const languagePart =
-        language !== 'english'
-            ? `Translate the keywords into ${language} before returning them:`
-            : '';
     const categoryPart =
         category !== 'general'
             ? `, taking into account the "${category}" category`
             : '';
 
-    const systemPrompt = `Identify the most relevant keywords from the input text${categoryPart}. ${languagePart} Provide the extracted keywords as a comma-separated list, without any additional text.`;
+    const systemPrompt = `Identify the most relevant keywords from the input text${categoryPart}.Provide the extracted keywords as a comma-separated list, without any additional text.`;
 
     console.log({ systemPrompt });
 
@@ -53,11 +50,6 @@ async function fetchKeywordsFromOpenAI(formData: FormData) {
                     role: 'system',
                     content: systemPrompt,
                 },
-
-                // {
-                //     role: 'system',
-                //     content: `Identify the top keywords from the input text, considering its "${category}" category. Translate the extracted keywords into ${language} before returning them.`,
-                // },
                 {
                     role: 'user',
                     content: text,
@@ -91,6 +83,7 @@ async function fetchKeywordsFromOpenAI(formData: FormData) {
 export const post: APIRoute = async ({ request }) => {
     try {
         const formData = Object.fromEntries(await request.formData());
+        const language = formData.language;
 
         const validationResult = FormDataSchema.safeParse(formData);
 
@@ -104,7 +97,11 @@ export const post: APIRoute = async ({ request }) => {
             );
         }
 
-        const keywords = await fetchKeywordsFromOpenAI(validationResult.data);
+        let keywords = await fetchKeywordsFromOpenAI(validationResult.data);
+
+        if (language !== 'en') {
+            keywords = await translateKeyWords(keywords, language);
+        }
 
         return new Response(JSON.stringify({ keywords }), {
             status: 200,
