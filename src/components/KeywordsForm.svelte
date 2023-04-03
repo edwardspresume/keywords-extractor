@@ -119,21 +119,26 @@
 {/if}
 
 {#if isSuccess && keywords}
-    <div
-        class="p-2 mt-5 rounded-lg shadow-sm font-bold bg-gray-100 text-green-600"
-    >
-        Keywords: {keywords}
-        <button
-            on:click={copyKeywordsToClipboard}
-            class="ml-2 p-1 mt-2 text-white bg-green-500 rounded-lg shadow-sm font-bold"
+    <div class="p-3 mt-5 rounded-lg shadow-sm bg-gray-100 flex flex-col">
+        <div
+            class="w-full flex justify-between items-center text-green-600 mb-3"
         >
-            Copy to Clipboard
-        </button>
+            <h3 class="font-bold">Keywords</h3>
+            <button
+                on:click={copyKeywordsToClipboard}
+                class="text-white bg-green-500 rounded-lg shadow-sm text-sm font-bold p-1"
+            >
+                Copy
+            </button>
+        </div>
+        <p class="text-green-800">
+            {keywords}
+        </p>
     </div>
 {/if}
 
 <style>
-    button {
+    button[type='submit'] {
         transition: all 0.8s;
         background: linear-gradient(to right, #d2721c, #10b981);
         background-size: 400% 400%;
