@@ -7,7 +7,6 @@
     let errorMessage: string | null = null;
 
     async function submit(e: Event) {
-        e.preventDefault();
 
         if (!inputText) {
             errorMessage = 'Please enter some text to process.';
@@ -51,7 +50,7 @@
     }
 </script>
 
-<form on:submit={submit}>
+<form on:submit|preventDefault={submit}>
     <label>
         <select
             required
