@@ -11,36 +11,34 @@ const FormDataSchema = z.object({
             MAX_CONTENT_LENGTH,
             `Input content is too long. The maximum length is ${MAX_CONTENT_LENGTH} characters.`
         ),
-    language: z.enum([
-        'english',
-        'chinese',
-        'spanish',
-        'french',
-        'russian',
-        'german',
-        'japanese',
-        'portuguese',
-        'italian',
-        'hindi',
-        'arabic',
-        'bengali',
-        'indonesian',
-        'korean',
-        'turkish',
-    ]),
+    language: z.string(),
+    category: z.string(),
 });
 
 // Define the type for the validated data
 type FormData = z.infer<typeof FormDataSchema>;
 
 async function fetchKeywordsFromOpenAI(formData: FormData) {
-    const { text, language } = formData;
+    const { text, language, category } = formData;
 
     if (!process.env.OPENAI_API_KEY) {
         throw new Error(
             'OPENAI_API_KEY is missing in the environment variables.'
         );
     }
+
+    const languagePart =
+        language !== 'english'
+            ? `Translate the keywords into ${language} before returning them:`
+            : '';
+    const categoryPart =
+        category !== 'general'
+            ? `, taking into account the "${category}" category`
+            : '';
+
+    const systemPrompt = `Identify the most relevant keywords from the input text${categoryPart}. ${languagePart} Provide the extracted keywords as a comma-separated list, without any additional text.`;
+
+    console.log({ systemPrompt });
 
     const options = {
         method: 'POST',
@@ -53,8 +51,13 @@ async function fetchKeywordsFromOpenAI(formData: FormData) {
             messages: [
                 {
                     role: 'system',
-                    content: `Only extract the keywords from the input text return the keywords in the following language: ${language}}`,
+                    content: systemPrompt,
                 },
+
+                // {
+                //     role: 'system',
+                //     content: `Identify the top keywords from the input text, considering its "${category}" category. Translate the extracted keywords into ${language} before returning them.`,
+                // },
                 {
                     role: 'user',
                     content: text,
