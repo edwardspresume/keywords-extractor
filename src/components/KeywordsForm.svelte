@@ -78,21 +78,21 @@
                 name="language"
                 class="w-full p-2 mt-1 border border-gray-300 rounded-lg shadow-sm text-gray-700"
             >
-                <option value="english" selected>English</option>
-                <option value="chinese">Chinese</option>
-                <option value="spanish">Spanish</option>
-                <option value="french">French</option>
-                <option value="russian">Russian</option>
-                <option value="german">German</option>
-                <option value="japanese">Japanese</option>
-                <option value="portuguese">Portuguese</option>
-                <option value="italian">Italian</option>
-                <option value="hindi">Hindi</option>
-                <option value="arabic">Arabic</option>
-                <option value="bengali">Bengali</option>
-                <option value="indonesian">Indonesian</option>
-                <option value="korean">Korean</option>
-                <option value="turkish">Turkish</option>
+                <option value="en" selected>English</option>
+                <option value="zh">Chinese</option>
+                <option value="es">Spanish</option>
+                <option value="fr">French</option>
+                <option value="ru">Russian</option>
+                <option value="de">German</option>
+                <option value="ja">Japanese</option>
+                <option value="pt">Portuguese</option>
+                <option value="it">Italian</option>
+                <option value="hi">Hindi</option>
+                <option value="ar">Arabic</option>
+                <option value="bn">Bengali</option>
+                <option value="id">Indonesian</option>
+                <option value="ko">Korean</option>
+                <option value="tr">Turkish</option>
             </select>
         </label>
 
